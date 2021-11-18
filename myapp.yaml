@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bb-database
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      bb: db
+  template:
+    metadata:
+      labels:
+        bb: db
+    spec:
+      containers:
+      - name: database
+        image: postgres:9.6
+        env:
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_DB
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "ursamajor"
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: dbbacking
+      volumes:
+      - name: dbbacking
+        hostPath:
+          path: /data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bb-frontend
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      bb: frontend
+  template:
+    metadata:
+      labels:
+        bb: frontend
+    spec:
+      containers:
+      - name: web
+        image: automationmusician/bb:web-0.1
+        volumeMounts:
+        - mountPath: "/logs"
+          name: logshare
+      - name: logging-sidecar
+        image: alpine:3.5
+        command: ["tail"]
+        args: ["-f", "/logs/api.log"]
+        volumeMounts:
+        - mountPath: "/logs"
+          name: logshare
+      volumes:
+      - name: logshare
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bb-entrypoint
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    bb: frontend
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bb-db
+  namespace: default
+spec:
+  selector:
+    bb: db
+  ports:
+  - port: 5432
+    targetPort: 5432
