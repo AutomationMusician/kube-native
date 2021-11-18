@@ -41,13 +41,15 @@ spec:
     spec:
       containers:
       - name: web
-        image: <docker hub user name>/bb:web-0.3
+        image: automationmusician/bb:web-0.3
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: bb-entrypoint
   namespace: default
+  labels:
+    app: bb
 spec:
   type: NodePort
   selector:
