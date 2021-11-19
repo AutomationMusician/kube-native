@@ -18,6 +18,7 @@ import com.docker.demo.configuration.JpaConfiguration;
 @EnableJpaRepositories("com.docker.demo.repository")
 public class DemoApp {
 	public static void main(String[] args) {
+	    System.out.println("starting program");
 		SpringApplication.run(DemoApp.class, args);
 	}
 }
