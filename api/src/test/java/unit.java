@@ -6,6 +6,7 @@ class apiUnitTests {
  
     @Test
     void justAnExample() {
+        System.out.println("Here are the unit tests");
     	Product testProd = new Product((long)9999, "testWidget", 19.95);
         assertEquals(testProd.getProductId(), 9999);
     }
